@@ -122,14 +122,93 @@ io.on("connection", (socket) => {
 
   // Chat Actions
 
-  socket.on(SocketEvent.SEND_MESSAGE, ({message}) => {
+  socket.on(SocketEvent.SEND_MESSAGE, ({ message }) => {
     const roomId = getRoomId(socket.id);
-    if(!roomId) return;
+    if (!roomId) return;
 
-    socket.broadcast.to(roomId).emit(SocketEvent.RECEIVE_MESSAGE, {message});
-  })
+    socket.broadcast.to(roomId).emit(SocketEvent.RECEIVE_MESSAGE, { message });
+  });
 
   // File Actions
+
+  socket.on(
+    SocketEvent.SYNC_FILE_STRUCTURE,
+    ({ fileStructure, openFiles, activeFile, socketId }) => {
+      io.to(socketId).emit(SocketEvent.SYNC_FILE_STRUCTURE, {
+        fileStructure,
+        openFiles,
+        activeFile,
+      });
+    }
+  );
+
+  socket.on(SocketEvent.DIRECTORY_CREATED, ({ parentDirId, newDirectory }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast
+      .to(roomId)
+      .emit(SocketEvent.DIRECTORY_DELETED, { parentDirId, newDirectory });
+  });
+
+  socket.on(SocketEvent.DIRECTORY_UPDATED, ({ dirId, children }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast
+      .to(roomId)
+      .emit(SocketEvent.DIRECTORY_UPDATED, { dirId, children });
+  });
+
+  socket.on(SocketEvent.DIRECTORY_RENAMED, ({ dirId, newName }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.DIRECTORY_RENAMED, {
+      dirId,
+      newName,
+    });
+  });
+
+  socket.on(SocketEvent.DIRECTORY_DELETED, ({ dirId }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.DIRECTORY_DELETED, { dirId });
+  });
+
+  socket.on(SocketEvent.FILE_CREATED, ({ parentDirId, newFile }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast
+      .to(roomId)
+      .emit(SocketEvent.FILE_CREATED, { parentDirId, newFile });
+  });
+
+  socket.on(SocketEvent.FILE_UPDATED, ({ fileId, newContent }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.FILE_UPDATED, {
+      fileId,
+      newContent,
+    });
+  });
+
+  socket.on(SocketEvent.FILE_RENAMED, ({ fileId, newName }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.FILE_RENAMED, {
+      fileId,
+      newName,
+    });
+  });
+
+  socket.on(SocketEvent.FILE_DELETED, ({ fileId }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.FILE_DELETED, { fileId });
+  });
+
+  // Cursor Position Actions
+
+  
+
 });
 
 app.get("/", (req: Request, res: Response) => {
