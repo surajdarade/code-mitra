@@ -80,6 +80,8 @@ io.on("connection", (socket) => {
     userSocketMap = userSocketMap.filter((u) => u.socketId !== socket.id);
     socket.leave(roomId);
   });
+
+  // File Actions
 });
 
 app.get("/", (req: Request, res: Response) => {
