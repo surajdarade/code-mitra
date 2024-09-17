@@ -43,8 +43,19 @@ const getUserBySocketId = (socketId: SocketId): User | null => {
   return user;
 };
 
+const getRoomId = (socketId: SocketId) => {
+  const roomId = userSocketMap.find((user) => {
+    user.socketId === socketId;
+  })?.roomId;
+
+  if (!roomId) console.error("Room ID is undefined for Socket ID: ", socketId);
+
+  return roomId;
+};
+
 io.on("connection", (socket) => {
   // User Actions
+
   socket.on(SocketEvent.JOIN_REQUEST, ({ roomId, username }) => {
     const isUsernameExist = getUsersInRoom(roomId).filter(
       (u) => u.username === username
@@ -79,6 +90,34 @@ io.on("connection", (socket) => {
     socket.broadcast.to(roomId).emit(SocketEvent.USER_DISCONNECTED, { user });
     userSocketMap = userSocketMap.filter((u) => u.socketId !== socket.id);
     socket.leave(roomId);
+  });
+
+  // User Status Actions
+
+  socket.on(SocketEvent.USER_OFFLINE, ({ socketId }) => {
+    userSocketMap = userSocketMap.map((user) => {
+      if (user.socketId === socketId) {
+        return { ...user, status: USER_CONNECTION_STATUS.OFFLINE };
+      }
+      return user;
+    });
+    const roomId = getRoomId(socketId);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.USER_OFFLINE, { socketId });
+  });
+
+  socket.on(SocketEvent.USER_ONLINE, ({ socketId }) => {
+    userSocketMap = userSocketMap.map((user) => {
+      if (user.socketId === socketId) {
+        return { ...user, status: USER_CONNECTION_STATUS.ONLINE };
+      }
+      return user;
+    });
+
+    const roomId = getRoomId(socketId);
+    if (!roomId) return;
+
+    socket.broadcast.to(roomId).emit(SocketEvent.USER_ONLINE, { socketId });
   });
 
   // File Actions
