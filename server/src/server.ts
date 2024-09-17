@@ -207,8 +207,55 @@ io.on("connection", (socket) => {
 
   // Cursor Position Actions
 
-  
+  socket.on(SocketEvent.TYPING_START, ({ cursorPosition }) => {
+    userSocketMap = userSocketMap.map((user) => {
+      if (user.socketId === socket.id) {
+        return { ...user, typig: true, cursorPosition };
+      }
+      return user;
+    });
 
+    const user = getUserBySocketId(socket.id);
+
+    if (!user) return;
+    const roomId = user.roomId;
+    socket.broadcast.to(roomId).emit(SocketEvent.TYPING_START, { user });
+  });
+
+  socket.on(SocketEvent.TYPING_PAUSE, () => {
+    userSocketMap = userSocketMap.map((user) => {
+      if (user.socketId === socket.id) {
+        return { ...user, typing: false };
+      }
+      return user;
+    });
+    const user = getUserBySocketId(socket.id);
+    if (!user) return;
+    const roomId = user.roomId;
+    socket.broadcast.to(roomId).emit(SocketEvent.TYPING_PAUSE, { user });
+  });
+
+  socket.on(SocketEvent.REQUEST_DRAWING, () => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast
+      .to(roomId)
+      .emit(SocketEvent.REQUEST_DRAWING, { socketId: socket.id });
+  });
+
+  socket.on(SocketEvent.SYNC_DRAWING, ({ drawingData, socketId }) => {
+    socket.broadcast
+      .to(socketId)
+      .emit(SocketEvent.SYNC_DRAWING, { drawingData });
+  });
+
+  socket.on(SocketEvent.DRAWING_UPDATE, ({ snapshot }) => {
+    const roomId = getRoomId(socket.id);
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit(SocketEvent.DRAWING_UPDATE, {
+      snapshot,
+    });
+  });
 });
 
 app.get("/", (req: Request, res: Response) => {
