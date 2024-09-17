@@ -120,6 +120,15 @@ io.on("connection", (socket) => {
     socket.broadcast.to(roomId).emit(SocketEvent.USER_ONLINE, { socketId });
   });
 
+  // Chat Actions
+
+  socket.on(SocketEvent.SEND_MESSAGE, ({message}) => {
+    const roomId = getRoomId(socket.id);
+    if(!roomId) return;
+
+    socket.broadcast.to(roomId).emit(SocketEvent.RECEIVE_MESSAGE, {message});
+  })
+
   // File Actions
 });
 
