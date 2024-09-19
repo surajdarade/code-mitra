@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from "@/api/"
 import { Language, RunContext as RunContextType } from "@/types/run"
 import langMap from "lang-map"
