@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useSettings } from "@/context/SettingContext"
 import { useEffect } from "react"
 
