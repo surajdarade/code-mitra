@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DrawingData } from "@/types/app"
 import {
     SocketEvent,

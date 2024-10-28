@@ -7,7 +7,7 @@ function GitHubCorner() {
 
     return (
         <a
-            href="https://github.com/surajdarade/"
+            href="https://github.com/surajdarade/code-mitra"
             className="github-corner"
             aria-label="View source on GitHub"
             target="_blank"

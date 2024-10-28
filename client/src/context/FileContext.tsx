@@ -807,4 +807,4 @@ function FileContextProvider({ children }: { children: ReactNode }) {
 }
 
 export { FileContextProvider }
-export default FileContext;
+export default FileContext
